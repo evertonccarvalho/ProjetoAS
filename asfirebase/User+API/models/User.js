@@ -1,6 +1,9 @@
 var knex = require("../database/connection");
+// const PasswordToken = require("./PasswordToken");
 var bcrypt = require("bcrypt");
-const PasswordToken = require("./PasswordToken");
+
+
+
 
 
 
@@ -12,7 +15,7 @@ class User{
     
     async findAll(){
         try{
-            var result = await knex.select(["id","email","role","name"]).table("users");
+            var result = await knex.select(["id","email","role","name","ubs"]).table("users");
             return result;
         }catch(err){
             console.log(err);
@@ -22,7 +25,7 @@ class User{
 
     async findById(id){
         try{
-            var result = await knex.select(["id","email","role","name"]).where({id:id}).table("users");
+            var result = await knex.select(["id","email","role","name","ubs"]).where({id:id}).table("users");
             
             if(result.length > 0){
                 return result[0];
@@ -38,7 +41,7 @@ class User{
 
     async findByEmail(email){
         try{
-            var result = await knex.select(["id","email","password","role","name"]).where({email:email}).table("users");
+            var result = await knex.select(["id","email","password","role","name","ubs"]).where({email:email}).table("users");
             
             if(result.length > 0){
                 return result[0];
@@ -52,10 +55,10 @@ class User{
         }
     }
 
-    async new(email,password,name){
+    async new(email,password,name,ubs){
         try{
             var hash = await bcrypt.hash(password, 10);
-            await knex.insert({email,password: hash,name,role: 0}).table("users");
+            await knex.insert({email,password: hash,name,ubs,role: 0}).table("users");
         }catch(err){
             console.log(err);
         }
@@ -77,7 +80,7 @@ class User{
         }
     }
 
-    async update(id,email,name,role){
+    async update(id,email,name,role,ubs){
 
         var user = await this.findById(id);
 
@@ -102,6 +105,9 @@ class User{
 
             if(role != undefined){
                 editUser.role = role;
+            }
+            if(ubs != undefined){
+                editUser.ubs = ubs;
             }
 
             try{
@@ -130,12 +136,20 @@ class User{
         }else{
             return {status: false,err: "O usuário não existe, portanto não pode ser deletado."}
         }
+
+        
+    }
+
+    async setUsed(token){
+        await knex.update({used: 1}).where({token: token}).table("passwordtokens");
     }
 
     async changePassword(newPassword,id,token){
         var hash = await bcrypt.hash(newPassword, 10);
         await knex.update({password: hash}).where({id: id}).table("users");
-        await PasswordToken.setUsed(token);
+
+        await this.setUsed(token);
+        
     }
 
 }

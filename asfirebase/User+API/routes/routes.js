@@ -4,7 +4,7 @@ var router = express.Router();
 var HomeController = require("../controllers/HomeController");
 var UserController = require("../controllers/UserController");
 var AdminAuth = require("../middleware/AdminAuth");
-var FormsController = require("../controllers/FormsController");
+var ObitosCrontoller = require("../controllers/ObitosCrontoller");
 
 router.get('/', HomeController.index);
 router.post('/user', UserController.create);
@@ -17,10 +17,16 @@ router.post("/changepassword",UserController.changePassword);
 router.post("/login",UserController.login);
 router.post("/validate",AdminAuth,HomeController.validate);
 
-router.post('/ssa2',FormsController.create);
-router.post('/nascidosvivos',FormsController.createVivos);
-router.post('/obitos',FormsController.createObitos);
+router.post('/ssa2',ObitosCrontoller.create);
+router.post('/nascidosvivos',ObitosCrontoller.createVivos);
 
 
+
+router.delete("/formularios/:id",ObitosCrontoller.removeForm);
+
+router.post('/obitos',ObitosCrontoller.createObitos);
+router.get("/formularios",ObitosCrontoller.indexForm); //ok
+router.get("/formularios/:id",ObitosCrontoller.findForm); //ok
+router.put("/formularios",ObitosCrontoller.editForm);
 
 module.exports = router;

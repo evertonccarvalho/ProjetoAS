@@ -1,5 +1,6 @@
-var User = require("../models/User");
-var PasswordToken = require("../models/PasswordToken");
+const User = require("../models/User");
+const PasswordToken = require("../models/PasswordToken");
+
 var jwt = require("jsonwebtoken");
 
 var secret = "adsuasgdhjasgdhjdgahjsg12hj3eg12hj3g12hj3g12hj3g123";
@@ -9,11 +10,7 @@ const { default: knex } = require("knex");
 
 
 
-class UserController{
-    
-    
-    
-
+class UserController {
     async index(req, res){
         var users = await User.findAll();
         res.json(users);
@@ -56,8 +53,8 @@ class UserController{
     }
 
     async edit(req, res){
-        var {id, name, role, email} = req.body;
-        var result = await User.update(id,email,name,role);
+        var {id, name, role, email, ubs} = req.body;
+        var result = await User.update(id,email,name,role,ubs);
         if(result != undefined){
             if(result.status){
                 res.status(200);
